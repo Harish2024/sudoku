@@ -1,10 +1,19 @@
-# Sudoku
+## EX.NO: 06
+## DATE: 07-06-2022
+## <p align="center">Sudoku</p>
 
 ## Aim:
 To develop a code to solve a sudoku puzzle using contraint propagation
 
 ## Theory:
 Sudoku consists of a 9x9 grid, and the objective is to fill the grid with digits in such a way that each row, each column, and each of the 9 principal 3x3 subsquares contains all of the digits from 1 to 9.
+
+## Sudoku puzzle:
+
+![sudoku](https://user-images.githubusercontent.com/75234588/173184334-8ca9ed22-748a-41e2-acaf-75b591627378.jpg)
+
+
+
 
 ## Design Steps:
 ### Step 1:
@@ -22,18 +31,25 @@ Calculate the time taken to solve the sudoku.
 
 ## Program:
 ```
-Developed By : harish.G
-Reg.no : 212220230021
+/*
+Name: harish g
+Reg. No: 212220230021
+*/
 ```
 ```python
-import time
 
+%matplotlib inline
+import matplotlib.pyplot as plt
+import random
+import math
+import sys
+puzzle='...8.....789.1...6.....61....7....5.5.87.93.4.4....2....32.....8...7.439.....1...'
 rows = 'ABCDEFGHI'
 cols = '123456789'
-def cross(a,b):
-    return [i+j for i in a for j in b]
 
-boxes = cross(rows,cols)
+def cross(a,b):
+    return [s+t for s in a for t in b]
+boxes= cross(rows, cols)
 row_units = [cross(r,cols) for r in rows]
 column_units = [cross(rows,c) for c in cols]
 square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
@@ -41,7 +57,27 @@ square_units = [cross(rs,cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456
 unitlist = row_units + column_units + square_units
 units = dict((s,[u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s,set(sum(units[s],[]))-set([s])) for s in boxes)
-
+def display(values):
+    width=1+max(len(values[s])for s in boxes)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|'if c in '36' else '')for c in cols))
+        if r in 'CF':print(line)
+    return
+def elimination(values):
+    solved_values = [box for box in values.keys() if len(values[box])==1]
+    for box in solved_values:
+        digit = values[box]
+        for peer in peers[box]:
+            values[peer] = values[peer].replace(digit,'')
+    return values
+def only_choice(values):
+    for unit in unitlist:
+        for digit in '123456789':
+            dplaces = [box for box in unit if digit in values[box]]
+            if len(dplaces) == 1:
+                values[dplaces[0]] = digit
+    return values
 def grid_values(grid):
     assert len(grid) == 81, "Input grid must be a string length of 81 (9x9)"
     boxes = cross(rows,cols)
@@ -58,31 +94,6 @@ def grid_values_improved(grid):
     assert len(values) == 81
     boxes = cross(rows,cols)
     return dict(zip(boxes,values))
-
-def display(values):
-    width =1+max(len(values[s]) for s in boxes)
-    line = '+'.join(['-'*(width*3)]*3)
-    for r in rows:
-        print(''.join(values[r+c].center(width)+('|' if c in '36' else '') for c in cols))
-        if r in 'CF':
-            print(line)
-    return
-def elimination(values):
-    solved_values = [box for box in values.keys() if len(values[box])==1]
-    for box in solved_values:
-        digit = values[box]
-        for peer in peers[box]:
-            values[peer] = values[peer].replace(digit,'')
-    return values
-
-def only_choice(values):
-    for unit in unitlist:
-        for digit in '123456789':
-            dplaces = [box for box in unit if digit in values[box]]
-            if len(dplaces) == 1:
-                values[dplaces[0]] = digit
-    return values
-
 def reduce_puzzle(values):
     stalled =False
     while not stalled:
@@ -94,7 +105,6 @@ def reduce_puzzle(values):
         if len([box for box in values.keys() if len(values[box])==1])==0:
             return False
     return values
-        
 def search(values):
     values_reduced = reduce_puzzle(values)
     if not values_reduced:
@@ -116,23 +126,13 @@ def search(values):
                 return new_values
             
     return values
-
-p='53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79'
-start_time = time.time()
-display(grid_values(p))
-p1=grid_values_improved(p)
-print("\n\n")
-display(p1)
+p1=grid_values_improved(puzzle)
 result = search(p1)
-print("\n\n")
 display(result)
-time_taken=time.time() - start_time
-print("\n\n{0} seconds".format(time_taken))
 ```
 
 ## Output:
-![Screenshot 2022-06-08 210254](https://user-images.githubusercontent.com/75235789/172658128-e7549e9a-74fa-4180-bb61-cbb5f2d8c869.jpg)
-![Screenshot 2022-06-08 210313](https://user-images.githubusercontent.com/75235789/172658150-d6d75377-749c-4ddc-ab6d-88f598f9f329.jpg)
+![Capture68](https://user-images.githubusercontent.com/75234588/173184203-a8166d05-ee6a-48b8-905a-d7efa376b161.PNG)
 
 
 
